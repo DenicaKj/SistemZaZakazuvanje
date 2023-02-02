@@ -1,0 +1,98 @@
+﻿@model SistemZaZakazuvanje.Models.ListApp
+@{
+    ViewBag.Title = "List";
+}
+
+<h2>My appointments</h2>
+
+<p>
+    <button type="button" class="btn btn-outline-secondary" style="background-color: #4C3138; color: white;" onclick="location.href='@Url.Action("Index", "Home")';return false;">Back</button>
+</p>
+<table class="table" style="border-spacing:30px">
+    <tr>
+        <th>
+            @Html.DisplayName("Status")
+        </th>
+        <th>
+            @Html.DisplayName("State Date")
+        </th>
+        <th>
+            @Html.DisplayName("End Date")
+        </th>
+        <th>
+            @Html.DisplayName("Service")
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.mine)
+    {
+        <tr style="border-spacing: 30px">
+            <td class="rounded border" style='color: white; border: solid 5px #F2E4E9; width: 100px; text-align: center; background-color: @(item.Status == "Pending" ? "#cc6666" : "#79907b");border-spacing:20px; '>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td style='color: #545454'>
+                @Html.DisplayFor(modelItem => item.StartTime)
+            </td>
+            <td style='color: #545454'>
+                @Html.DisplayFor(modelItem => item.EndTime)
+            </td>
+            <td style='color: #545454'>
+                @Html.DisplayFor(m => item.Usluga)
+            </td>
+            <td style='color: #545454'>
+
+
+                @if (item.Status == "Pending")
+                {
+
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span> | </span>
+                    @Html.ActionLink("Cancel", "Cancel", new { id = item.Id },
+                   new { onclick = "return confirm('Are sure wants to cancel this appointment?');" });
+                }
+
+            </td>
+        </tr>
+    }
+
+</table>
+<h2>Cancelled</h2>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Status")
+        </th>
+        <th>
+            @Html.DisplayName("State Date")
+        </th>
+        <th>
+            @Html.DisplayName("End Date")
+        </th>
+        <th>
+            @Html.DisplayName("Service")
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.cancelled)
+    {
+        <tr style='background-color:grey'>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndTime)
+            </td>
+            <td>
+                @Html.DisplayFor(m => item.Usluga)
+            </td>
+            <td>
+            </td>
+        </tr>
+    }
+
+</table>
+

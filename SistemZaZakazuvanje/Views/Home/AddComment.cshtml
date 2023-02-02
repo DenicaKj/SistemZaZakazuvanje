@@ -1,0 +1,51 @@
+﻿@model SistemZaZakazuvanje.Models.Comment
+
+@{
+    ViewBag.Title = "AddComment";
+}
+
+<h2>Add Comment</h2>
+<p>
+    <button type="button" class="btn btn-outline-secondary" style="background-color: #4C3138; color: white;" onclick="location.href='@Url.Action("Reviews", "Home")';return false;">Back to Reviews</button>
+
+
+</p>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Comment</h4>
+        <hr />
+        
+            @{
+               
+                Model.IdReview = ViewBag.id;
+                Model.UserName = User.Identity.Name;
+                Model.UserId = ViewBag.userId;
+           }
+        @Html.HiddenFor(m=>m.IdReview)
+        @Html.HiddenFor(m=>m.UserName)
+        @Html.HiddenFor(m=>m.UserId)
+        <div class="form-group">
+           
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" style="background-color: #4C3138; color: white;" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

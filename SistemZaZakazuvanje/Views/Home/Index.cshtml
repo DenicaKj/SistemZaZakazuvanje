@@ -1,0 +1,187 @@
+﻿@using Syncfusion.EJ2.Schedule
+@using Syncfusion.EJ2.Buttons
+@model SistemZaZakazuvanje.Models.Appointment
+@using Microsoft.AspNet.Identity
+
+@{
+    var validationRules = new Dictionary<string, object>() { { "required", true } };
+
+}
+<h4>
+    @if (User.IsInRole("User"))
+    {
+        <button type="button" class="btn btn-outline-secondary" style="background-color: #4C3138; color: white" onclick="location.href='@Url.Action("List", "Home")';return false;">My appointments</button>
+
+    }
+    @if (User.IsInRole("Administrator"))
+    {
+        <button class="btn btn-outline-secondary" style="background-color: #4C3138; color: white" onclick="location.href='@Url.Action("ListAll", "Home")';return false;">All appoinments</button>
+    }
+</h4>
+<br />
+@(Html.EJS().Schedule("schedule")
+    .Width("100%")
+    .Height("550px")
+    .EventSettings(e => e.DataSource(d => d.Url("Home/LoadData").CrudUrl("Home/UpdateData").Adaptor("UrlAdaptor").CrossDomain(true)).Fields(d => d.StartTime(p => p.Name("StartTime").Title("Време").Validation(validationRules)).Subject(p=>p.Validation(validationRules))))
+    .PopupOpen("onPopupOpen")
+    .EventRendered("onEventRendered")
+    .AllowResizing(false)
+    .AllowDragAndDrop(false)
+    .AllowMultiDrag(true)
+    .StartHour("09:00")
+    .EndHour("18:00")
+    .ShowWeekend(false)
+    .ShowQuickInfo(false)
+    .Render()
+
+)
+
+
+
+
+@section Styles{
+    <style>
+        .e-location-container,
+        .e-time-zone-container,
+        .e-interval,
+        .e-end-container,
+        .e-all-day-time-zone-row,
+        .e-repeat-parent-row,
+        .e-all-day-container,
+        .e-recurrenceeditor,
+        .e-description-row {
+            display: none;
+        }
+
+        .e-schedule .e-vertical-view .e-all-day-appointment-wrapper .e-appointment.pending,
+        .e-schedule .e-vertical-view .e-day-wrapper .e-appointment.pending,
+        .e-schedule .e-month-view .e-appointment.pending {
+            background: #32CD32;
+        }
+
+        .custom-field-row {
+            width: 300px;
+        }
+
+        #UslugaId_Error {
+            top: 60px !important;
+            left: 70.5px !important;
+        }
+    </style>
+
+}
+@section Scripts{
+    <script type="text/javascript">
+
+
+        function onPopupOpen(args) {
+            var pom = args.data.Status;
+            if (args.type === 'Editor') {
+                // Create required custom elements in initial time
+                if (!args.element.querySelector('.custom-field-row')) {
+                    var row = ej.base.createElement('div', { className: 'custom-field-row' });
+                    var formElement = args.element.querySelector('.e-schedule-form');
+                    formElement.firstChild.insertBefore(row, args.element.querySelector('.e-title-location-row'));
+                    var container = ej.base.createElement('div', { className: 'custom-field-container' });
+                    var inputEle = ej.base.createElement('input', {
+                        className: 'e-field', attrs: { name: 'UslugaId' }
+                    });
+                    container.appendChild(inputEle);
+                    row.appendChild(container);
+                    var drowDownList = new ej.dropdowns.DropDownList({
+                        dataSource: [
+                            { text: 'Manicure', value: '1' },
+                            { text: 'French Manicure', value: '2' },
+                            { text: 'Pedicure', value: '3' },
+                            { text: 'Waxing-Face', value: '4' },
+                            { text: 'Waxing-Eyebrows', value: '5' },
+                            { text: 'Waxing-Lip', value: '6' },
+                            { text: 'Waxing-Full Leg', value: '8' },
+                            { text: 'Waxing-Lower Leg', value: '9' },
+                            { text: 'Bikini', value: '10' },
+                            { text: 'Under-Arms', value: '11' },
+                            { text: 'Full-Arms', value: '12' },
+                            { text: 'Back', value: '13' },
+                            { text: 'European Facial', value: '14' },
+                            { text: 'Deep Hydration Facial', value: '15' },
+                            { text: 'Acne Facial', value: '16' },
+                            { text: 'Full Face Makeup', value: '17' },
+                            { text: 'Bridal Makeup', value: '18' },
+                            { text: 'Cut & Blow Dry', value: '19' },
+                            { text: 'Color & Blow Dry', value: '20' },
+                            { text: 'Ombre Color', value: '21' },
+                            { text: 'Highlights', value: '22' }
+                        ],
+                        fields: { text: 'text', value: 'value' },
+                        value: (args.data).EventType,
+                        floatLabelType: 'Always', placeholder: 'Услуга'
+                    });
+                    drowDownList.appendTo(inputEle);
+                    inputEle.setAttribute('name', 'UslugaId');
+
+                    var validator = (formElement).ej2_instances[0];
+                    validator.addRules('UslugaId', { required: [true, 'This field is required'] });
+                }
+            }
+            var button1 = document.querySelector(".e-schedule-dialog .e-event-save");
+            button1.style.backgroundColor = "#4C3138"
+            if (args.type == "QuickInfo") {
+
+                var button2 = document.querySelector(".e-event-edit");
+                button2.style.backgroundColor = "#4C3138"
+                button2.style.color ="white"
+            }
+            var userRole = @(User.IsInRole("User") ? "true" : "false");
+            var eventObj = args.data instanceof Array ? args.data[0] : args.data
+            if (userRole) {
+                var button = document.querySelector(".e-schedule-dialog .e-event-delete");
+                button.style.display = "none";
+
+            }
+
+            if ((!args.target.classList.contains('e-appointment') && (args.type === 'QuickInfo')) || (args.type === 'Editor')) {
+                args.cancel = onEventCheck(args);
+            }
+
+
+
+        }
+
+        function onEventCheck(args) {
+            var eventObj = args.data instanceof Array ? args.data[0] : args.data;
+            var pom = false;
+            if (eventObj.StartTime <= new Date())
+                pom = true;
+            var userRole1 = @(User.IsInRole("User") ? "true" : "false");
+            if (userRole1) {
+                var uId = '@ViewBag.user';
+                console.log(uId)
+                if (eventObj.UserId != null) {
+                    if (eventObj.UserId != uId) {
+
+                        pom = true;
+                    }
+                }
+            }
+            if (eventObj.Status != null) {
+                if (eventObj.Status !== "Pending")
+                    pom = true;
+                    }
+            return pom;
+        }
+
+    function onEventRendered(args) {
+        var scheduleObj = document.querySelector('.e-schedule').ej2_instances[0];
+        var categoryColor = args.data.color;
+        if (!args.element || !categoryColor) {
+            return;
+        }
+        if (scheduleObj.currentView === 'Agenda') {
+            (args.element.firstChild).style.borderLeftColor = categoryColor;
+        } else {
+            args.element.style.backgroundColor = categoryColor;
+        }
+
+    }
+    </script>
+}

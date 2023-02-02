@@ -1,0 +1,75 @@
+﻿@model IEnumerable<SistemZaZakazuvanje.Models.Appointment>
+
+
+@{
+    ViewBag.Title = "List All Appointments";
+}
+
+<h2>List All Appointments</h2>
+
+<p>
+    <button type="button" class="btn btn-outline-secondary" style="background-color: #4C3138; color: white;" onclick="location.href='@Url.Action("Index", "Home")';return false;">Back</button>
+</p>
+<table id="appointmentT" class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Usluga)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+
+    @foreach (var item in Model)
+    {
+        <tbody>
+            <tr>
+                <td class="rounded border" style='color:white;border: solid 5px #F2E4E9; width: 100px; text-align: center; background-color: @(item.Status == "Pending" ? "#cc6666" : "#79907b") '>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.Usluga)
+                </td>
+                <td>
+
+
+                    @if (item.Status == "Pending")
+                    {
+                        @Html.ActionLink("Approve", "Approve", new { id = item.Id },
+                    new { onclick = "return confirm('Are sure wants to approve this appointment?');" })<span> | </span>
+                    }
+                    @Html.ActionLink("Cancel", "CancelApp", new { id = item.Id }, new { onclick = "return confirm('Are sure wants to cancel this appointment?');" })
+
+
+                </td>
+            </tr>
+        </tbody>
+    }
+
+</table>
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $("#appointmentT").DataTable();
+
+
+        })
+    </script>
+}
